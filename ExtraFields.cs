@@ -14,10 +14,15 @@ namespace ExtraFields
 {
     public partial class ExtraFields : Form
     {
-        string serverName = "192.168.2.2";
+        //string serverName = "192.168.2.2";
+        //string dbname = "LIVE";
+        //string usname = "SA";
+        //string pass = "1q2w#E$R%T";
+
+        string serverName = "JFEVISUAL7";
         string dbname = "LIVE";
-        string usname = "SA";
-        string pass = "1q2w#E$R%T";
+        string usname = "SYSADM";
+        string pass = "COPOW05";
 
         string type = "ad";
         string searchField = "";
@@ -28,6 +33,8 @@ namespace ExtraFields
             string SqlConnectionString = $"Data Source={serverName}; Initial Catalog = {dbname}; User ID = {usname}; Password = {pass}; MultipleActiveResultSets=True";
             InitializeComponent();
             ProcessArguments(args);
+
+            //MessageBox.Show(args.ToString());
 
             this.Text = "Extra fields - " + searchField.ToString();
             this.StartPosition = FormStartPosition.Manual;
@@ -45,15 +52,16 @@ namespace ExtraFields
                 type = args[1].ToString();
                 searchField = args[2].ToString();
             }
-            if (type == "part")
+            if (type.ToUpper() == "Z_PART")
             {
                 label1.Text = "Part ID: ";
-                label2.Text = "Minus: ";
-                label3.Text = "Plus: ";
+                label2.Text = "Build Tolerance Minus: ";
+                label3.Text = "Build Tolerance Plus: ";
             }
             else
             {
                 MessageBox.Show("Type unknown!");
+                this.Close();
                 return;
             }
 
