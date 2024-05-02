@@ -15,7 +15,6 @@ namespace ExtraFields
         /// The main entry point for the application.
         /// </summary>
         static Mutex mutex = new Mutex(true, "{SomeUniqueStringHere}");
-        static NamedPipeServerStream pipeServer;
 
         [STAThread]
         static void Main()
@@ -32,7 +31,6 @@ namespace ExtraFields
             }
 
             GC.KeepAlive(mutex);
-
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new ExtraFields(passInArgs));

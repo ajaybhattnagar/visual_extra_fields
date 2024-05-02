@@ -14,10 +14,11 @@ namespace ExtraFields
 {
     public partial class ExtraFields : Form
     {
-        //string serverName = "192.168.2.2";
-        //string dbname = "LIVE";
-        //string usname = "SA";
-        //string pass = "1q2w#E$R%T";
+  /*      string serverName = "192.168.2.2";
+        string dbname = "LIVE";
+        string usname = "SA";
+        string pass = "1q2w#E$R%T";*/
+        
 
         string serverName = "JFEVISUAL7";
         string dbname = "LIVE";
@@ -55,8 +56,8 @@ namespace ExtraFields
             if (type.ToUpper() == "Z_PART")
             {
                 label1.Text = "Part ID: ";
-                label2.Text = "Build Tolerance Minus: ";
-                label3.Text = "Build Tolerance Plus: ";
+                //label2.Text = "Build Tolerance Minus: ";
+                //label3.Text = "Build Tolerance Plus: ";
             }
             else
             {
@@ -148,7 +149,7 @@ namespace ExtraFields
                 return;
             }
 
-            string COLUMNS = "BUILD_TOL_PLUS";
+            string COLUMNS = "BUILD_TOL_MINUS";
             string VALUE = textBox2.Text;
 
             string update_statement = @"UPDATE Z_PART SET " +  COLUMNS + " = " + VALUE + " WHERE PART_ID = '" + searchField + "'";
@@ -181,7 +182,7 @@ namespace ExtraFields
                 return;
             }
 
-            string COLUMNS = "BUILD_TOL_MINUS";
+            string COLUMNS = "BUILD_TOL_PLUS";
             string VALUE = textBox3.Text;
 
             string update_statement = @"UPDATE Z_PART SET " + COLUMNS + " = " + VALUE + " WHERE PART_ID = '" + searchField + "'";
