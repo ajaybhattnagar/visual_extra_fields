@@ -14,19 +14,20 @@ namespace ExtraFields
 {
     public partial class ExtraFields : Form
     {
-  /*      string serverName = "192.168.2.2";
+       /* string serverName = "192.168.2.2";
         string dbname = "LIVE";
         string usname = "SA";
         string pass = "1q2w#E$R%T";*/
         
 
-        string serverName = "JFEVISUAL7";
+        string serverName = "JFEVISUAL10";
         string dbname = "LIVE";
         string usname = "SYSADM";
         string pass = "COPOW05";
 
         string type = "ad";
         string searchField = "";
+        public Decimal buildValue = 0;
 
 
         public ExtraFields(string[] args)
@@ -59,6 +60,10 @@ namespace ExtraFields
                 //label2.Text = "Build Tolerance Minus: ";
                 //label3.Text = "Build Tolerance Plus: ";
             }
+            /*else
+            {
+                searchField = "10-027009";
+            }*/
             else
             {
                 MessageBox.Show("Type unknown!");
@@ -102,11 +107,18 @@ namespace ExtraFields
         {
             check_if_record_exists();
             get_information();
+
+            textBox2.Focus();
         }
 
         private void get_information()
         {
-            string details = @"SELECT TOP 1 * FROM Z_PART WHERE PART_ID = @PART_ID ";
+            string details = @"SELECT TOP 1 Z_PART.PART_ID, Z_PART.BUILD_TOL_PLUS, Z_PART.BUILD_TOL_MINUS,
+                                (SELECT USER_2 FROM OPERATION WHERE WORKORDER_BASE_ID = Z_PART.PART_ID AND WORKORDER_TYPE = 'M' AND SEQUENCE_NO = 10 AND WORKORDER_SUB_ID = 0) AS [BUILD],
+                                TOL.[IN], TOL.MM
+                                FROM Z_PART 
+                                LEFT JOIN JFE_BUILD_TOLS TOL ON TOL.PART_ID = Z_PART.PART_ID
+                                WHERE Z_PART.PART_ID = @PART_ID ";
             string SqlConnectionString = $"Data Source={serverName}; Initial Catalog = {dbname}; User ID = {usname}; Password = {pass}; MultipleActiveResultSets=True";
 
             try
@@ -125,6 +137,10 @@ namespace ExtraFields
                     textBox1.Text = searchField;
                     textBox2.Text = record["BUILD_TOL_PLUS"].ToString();
                     textBox3.Text = record["BUILD_TOL_MINUS"].ToString();
+                    textBox4.Text = record["BUILD"].ToString();
+                    textBox5.Text = record["IN"].ToString();
+                    textBox6.Text = record["MM"].ToString();
+                    buildValue = decimal.Parse(record["BUILD"].ToString());
                 }
                 else
                 {
@@ -149,7 +165,7 @@ namespace ExtraFields
                 return;
             }
 
-            string COLUMNS = "BUILD_TOL_MINUS";
+            string COLUMNS = "BUILD_TOL_PLUS";
             string VALUE = textBox2.Text;
 
             string update_statement = @"UPDATE Z_PART SET " +  COLUMNS + " = " + VALUE + " WHERE PART_ID = '" + searchField + "'";
@@ -169,6 +185,8 @@ namespace ExtraFields
             }
             conn.Close();
 
+            //Load info again
+            get_information();
 
         }
 
@@ -182,7 +200,7 @@ namespace ExtraFields
                 return;
             }
 
-            string COLUMNS = "BUILD_TOL_PLUS";
+            string COLUMNS = "BUILD_TOL_MINUS";
             string VALUE = textBox3.Text;
 
             string update_statement = @"UPDATE Z_PART SET " + COLUMNS + " = " + VALUE + " WHERE PART_ID = '" + searchField + "'";
@@ -201,6 +219,36 @@ namespace ExtraFields
                 MessageBox.Show($"Error message: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             conn.Close();
+
+            //Load info again
+            get_information();
+
+        }
+
+        private void clear_Click(object sender, EventArgs e)
+        {
+            string update_statement = @"UPDATE Z_PART SET BUILD_TOL_PLUS = NULL, BUILD_TOL_MINUS = NULL WHERE PART_ID = '" + searchField + "'";
+            string SqlConnectionString = $"Data Source={serverName}; Initial Catalog = {dbname}; User ID = {usname}; Password = {pass}; MultipleActiveResultSets=True";
+            SqlConnection conn = new SqlConnection(SqlConnectionString);
+            SqlCommand cmd = new SqlCommand();
+            cmd.Connection = conn;
+            cmd.CommandText = update_statement;
+            conn.Open();
+            try
+            {
+                cmd.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error message: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            conn.Close();
+            get_information();
+        }
+
+        private void window_close(object sender, FormClosedEventArgs e)
+        {
+            Application.Exit();
         }
     }
 
